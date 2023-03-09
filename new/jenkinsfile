@@ -1,0 +1,54 @@
+pipeline{
+  agent any 
+  tools {
+    maven 'Maven' 
+  }
+  stages {
+    stage("build jar")
+         steps{
+            script{
+              echo "bulding the application..."
+              sh 'mvn package'
+            }
+         }
+  }
+   stages {
+    stage("build image")
+         steps{
+            script{
+              echo "bulding the docker image..."
+              withCredentials([usernamePassword(credentialsId: 'mydockerhubrepo', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                sh 'docker build -t ahmedata32/demo-app:jma-2.0 .'
+                sh "echo $PASS | docker login -u $USER --password-stdin"
+                sh 'docker push ahmedata32/demo-app:jma-2.0'
+              }
+            }
+            }
+  }
+    stages ("deploy") {
+     steps {
+         script {
+            echo "deploying the application..."
+            }
+            }
+         }
+     }
+    }
+
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
